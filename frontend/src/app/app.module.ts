@@ -12,6 +12,7 @@ import { ContactComponent } from './contact/contact.component';
 import { ManagementComponent } from './management/management.component';
 import { HttpClientModule } from '@angular/common/http';
 import { RegisterComponent } from './register/register.component';
+import { BookingDetailComponent } from './booking-detail/booking-detail.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { RegisterComponent } from './register/register.component';
     DocumentsComponent,
     ContactComponent,
     ManagementComponent,
-    RegisterComponent
+    RegisterComponent,
+    BookingDetailComponent
   ],
   imports: [
     HttpClientModule,

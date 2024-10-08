@@ -7,6 +7,7 @@ import { DocumentsComponent } from './documents/documents.component';
 import { ContactComponent } from './contact/contact.component';
 import { ManagementComponent } from './management/management.component';
 import { RegisterComponent } from './register/register.component';
+import { BookingDetailComponent } from './booking-detail/booking-detail.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' }, // เส้นทางเริ่มต้น, ถ้าไม่มีเส้นทางจะไปที่ Home
@@ -14,6 +15,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'booking', component: BookingComponent },
+  { path: 'booking-detail', component: BookingDetailComponent },
   { path: 'documents', component: DocumentsComponent },
   { path: 'contact', component: ContactComponent },
   { path: 'management', component: ManagementComponent },

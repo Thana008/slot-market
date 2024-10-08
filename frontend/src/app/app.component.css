@@ -1,0 +1,9 @@
+.navbar .signup-button,
+.navbar .login-button {
+  margin-left: 10px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
