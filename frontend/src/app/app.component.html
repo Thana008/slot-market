@@ -17,18 +17,31 @@
       <li class="nav-item">
         <a class="nav-link" routerLink="/documents">Documents</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" routerLink="/management">Management</a>
-      </li>
     </ul>
-    <ul class="navbar-nav ms-auto"> <!-- ทำให้ปุ่มอยู่ทางขวา -->
-      <li class="nav-item">
+    <ul class="navbar-nav ms-auto">
+      <!-- แสดงปุ่ม Login และ Signup ถ้ายังไม่ได้ล็อกอิน -->
+      <li class="nav-item" *ngIf="!isLoggedIn">
         <a class="nav-link btn btn-dark me-2" routerLink="/login"><i class="bi bi-key"></i> Login</a>
       </li>
-      <li class="nav-item">
+      <li class="nav-item" *ngIf="!isLoggedIn">
         <a class="nav-link btn btn-success" routerLink="/signup"><i class="bi bi-person-fill-add"></i> Signup</a>
       </li>
+    
+      <!-- แสดงชื่อผู้ใช้และปุ่ม Logout เมื่อล็อกอินแล้ว -->
+      <li class="nav-item dropdown" *ngIf="isLoggedIn">
+        <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          Welcome, {{ username }}
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <li *ngIf="userRole === 'admin'">
+            <a class="dropdown-item" routerLink="/management">Management</a>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" (click)="onLogout()">Logout</a></li>
+        </ul>
+      </li>
     </ul>
+    
   </div>
 </nav>
 

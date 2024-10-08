@@ -96,6 +96,48 @@ app.post('/auth/login', async (req, res) => {
   }
 });
 
+// Get all bookings
+app.get('/api/bookings', async (req, res) => {
+  try {
+    const poolConnection = await pool(); // Get pool connection
+    const result = await poolConnection.request().query('SELECT * FROM bookings');
+
+    res.status(200).json(result.recordset);
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
+    res.status(500).json({ message: 'Error fetching bookings', error: error.message });
+  }
+});
+
+// Update booking status
+app.put('/api/bookings/:id/status', async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const validStatuses = ['taste_test', 'confirmed', 'cancelled']; // Valid statuses to update
+
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ message: 'Invalid status' });
+  }
+
+  try {
+    const poolConnection = await pool(); // Get pool connection
+
+    // Update the status of the booking
+    await poolConnection.request()
+      .input('id', sql.Int, id)
+      .input('status', sql.VarChar(20), status)
+      .query('UPDATE bookings SET status = @status WHERE id = @id');
+
+    res.status(200).json({ message: 'Booking status updated successfully' });
+  } catch (error) {
+    console.error('Error updating booking status:', error);
+    res.status(500).json({ message: 'Error updating booking status', error: error.message });
+  }
+});
+
+
+
 // Create Booking
 app.post('/api/bookings', async (req, res) => {
   try {

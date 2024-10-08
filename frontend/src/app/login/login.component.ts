@@ -30,9 +30,9 @@ export class LoginComponent {
 
         // นำผู้ใช้ไปยัง dashboard ที่เหมาะสมตาม role
         if (response.user.role === 'admin') {
-          this.router.navigate(['/admin-dashboard']);
+          this.router.navigate(['/management']);
         } else {
-          this.router.navigate(['/user-dashboard']);
+          this.router.navigate(['/home']);
         }
       },
       error => {
