@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { AuthService } from '../auth.service';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -9,21 +10,25 @@ export class RegisterComponent {
   username: string = '';
   email: string = '';
   password: string = '';
+  role: string = 'vendor'; 
 
-  constructor(private authService: AuthService) {}
+  private apiUrl = 'http://localhost:3000/auth/register'; // Replace with your API URL
+
+  constructor(private http: HttpClient, private router: Router) {} // Inject Router here
 
   registerUser() {
     const userData = {
       username: this.username,
       email: this.email,
       password: this.password,
-      role: 'user' // กำหนดค่า role เป็น 'user'
+      role: this.role,
     };
 
-    this.authService.register(userData).subscribe(
+    this.http.post(this.apiUrl, userData).subscribe(
       response => {
         console.log('Register successful', response);
         alert('Registration successful');
+        this.router.navigate(['/login']); // Navigate to the login page after successful registration
       },
       error => {
         console.error('Register failed', error);

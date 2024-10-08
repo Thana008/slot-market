@@ -1,21 +1,23 @@
 const sql = require('mssql');
 
-// กำหนดค่าการเชื่อมต่อกับฐานข้อมูล SQL Server
+// Database configuration
 const config = {
   user: 'sa',
-  password: '123456789',
-  server: 'LAPTOP-GSHFC4D4',
+  password: '1234',
+  server: 'localhost',
   database: 'slot_market',
   options: {
     encrypt: true,
-    trustServerCertificate: true
-  }
+    trustServerCertificate: true,
+  },
 };
 
-// ฟังก์ชันเพื่อเชื่อมต่อกับฐานข้อมูล SQL Server
+// Create a pool variable
+let pool;
+
 async function connectToDatabase() {
   try {
-    await sql.connect(config);
+    pool = await sql.connect(config);
     console.log('Connected to SQL Server!');
   } catch (err) {
     console.error('Error connecting to SQL Server:', err);
@@ -23,7 +25,12 @@ async function connectToDatabase() {
   }
 }
 
+// Call the connect function to initialize the pool
+connectToDatabase();
+
+// Exporting the pool as a function to get the current pool
 module.exports = {
   sql,
-  connectToDatabase
+  pool: () => pool, // Export pool as a function
+  connectToDatabase,
 };
