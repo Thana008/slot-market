@@ -1,3 +1,4 @@
+require('dotenv').config(); // Load environment variables from .env
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -12,17 +13,13 @@ const app = express(); // Initialize the express app
 app.use(bodyParser.json());
 app.use(cors());
 
-// Secret key for JWT
-const JWT_SECRET = 'your_secret_key';
+// Secret key for JWT - using environment variable instead of hardcoding
+const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key';
 
 // Connect to the database
 connectToDatabase().catch(err => {
   console.error('Database connection failed:', err);
 });
-
-
-app.use(bodyParser.json());
-app.use(cors());
 
 // Registration Endpoint
 app.post('/auth/register', async (req, res) => {
@@ -58,14 +55,15 @@ app.post('/auth/register', async (req, res) => {
   }
 });
 
-
 // Login Endpoint
 app.post('/auth/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const query = `SELECT * FROM users WHERE username = '${username}'`;
-    const result = await sql.query(query);
+    const query = `SELECT * FROM users WHERE username = @username`;
+    const request = new sql.Request();
+    request.input('username', sql.VarChar, username);
+    const result = await request.query(query);
 
     if (result.recordset.length === 0) {
       return res.status(400).json({ message: 'Invalid username or password' });
@@ -80,9 +78,18 @@ app.post('/auth/login', async (req, res) => {
     }
 
     // Create JWT token
-    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(
+      { id: user.id, username: user.username, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
 
-    res.json({ token, message: 'Login successful' });
+    // Return the token and user data
+    res.json({
+      token,
+      user: { id: user.id, username: user.username, role: user.role },
+      message: 'Login successful'
+    });
   } catch (err) {
     console.error('Login failed:', err);
     res.status(500).json({ message: 'Login failed', error: err.message });

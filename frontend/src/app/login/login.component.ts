@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http'; // Make sure to import HttpClient if you need it
+import { HttpClient } from '@angular/common/http'; // ตรวจสอบให้แน่ใจว่า HttpClient ถูก import แล้ว
 
 @Component({
   selector: 'app-login',
@@ -11,23 +11,33 @@ export class LoginComponent {
   username: string = '';
   password: string = '';
 
-  constructor(private authService: AuthService, private router: Router) {} // Inject AuthService here
+  constructor(private authService: AuthService, private http: HttpClient, private router: Router) { }
 
   loginUser() {
-    const credentials = {
+    const loginData = {
       username: this.username,
-      password: this.password,
+      password: this.password
     };
 
-    this.authService.login(credentials).subscribe(
-      response => {
-        console.log('Login successful', response);
-        // Optionally store user info in local storage or handle the response accordingly
-        this.router.navigate(['/home']); // Navigate to the home page after successful login
+    // ใช้ AuthService ในการจัดการคำร้องขอล็อกอิน
+    this.authService.login(loginData).subscribe(
+      (response: any) => {
+        // เก็บ token และรายละเอียดผู้ใช้ใน localStorage
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user_id', response.user.id);
+        localStorage.setItem('username', response.user.username);
+        localStorage.setItem('role', response.user.role);
+
+        // นำผู้ใช้ไปยัง dashboard ที่เหมาะสมตาม role
+        if (response.user.role === 'admin') {
+          this.router.navigate(['/admin-dashboard']);
+        } else {
+          this.router.navigate(['/user-dashboard']);
+        }
       },
       error => {
-        console.error('Login failed', error);
-        alert('Login failed. Please check your credentials and try again.'); // User feedback for login failure
+        console.error('การล็อกอินล้มเหลว', error);
+        alert('การล็อกอินล้มเหลว โปรดตรวจสอบข้อมูลแล้วลองอีกครั้ง');
       }
     );
   }

@@ -8,6 +8,7 @@ import { ContactComponent } from './contact/contact.component';
 import { ManagementComponent } from './management/management.component';
 import { RegisterComponent } from './register/register.component';
 import { BookingDetailComponent } from './booking-detail/booking-detail.component';
+import { AuthGuard } from './auth.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' }, // เส้นทางเริ่มต้น, ถ้าไม่มีเส้นทางจะไปที่ Home
@@ -18,8 +19,8 @@ const routes: Routes = [
   { path: 'booking-detail', component: BookingDetailComponent },
   { path: 'documents', component: DocumentsComponent },
   { path: 'contact', component: ContactComponent },
-  { path: 'management', component: ManagementComponent },
-  { path: '**', redirectTo: '/home' } // ถ้าเส้นทางไม่ถูกต้อง, จะเปลี่ยนไปที่ Home
+  { path: 'management', component: ManagementComponent, canActivate: [AuthGuard]  },
+  { path: '**', redirectTo: '/home' }, // ถ้าเส้นทางไม่ถูกต้อง, จะเปลี่ยนไปที่ Home
 ];
 
 @NgModule({

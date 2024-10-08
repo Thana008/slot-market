@@ -1,1 +1,23 @@
-<p>booking works!</p>
+<div class="container mt-4">
+    <h2>แบบฟอร์มสนใจขายของในตลาด</h2>
+    <form (ngSubmit)="submitBooking()">
+      <div class="mb-3">
+        <label for="firstname" class="form-label">ชื่อ</label>
+        <input type="text" class="form-control" id="firstname" [(ngModel)]="bookingData.firstname" name="firstname" required>
+      </div>
+      <div class="mb-3">
+        <label for="lastname" class="form-label">นามสกุล</label>
+        <input type="text" class="form-control" id="lastname" [(ngModel)]="bookingData.lastname" name="lastname" required>
+      </div>
+      <div class="mb-3">
+        <label for="phone" class="form-label">เบอร์โทรติดต่อ</label>
+        <input type="text" class="form-control" id="phone" [(ngModel)]="bookingData.phone" name="phone" required>
+      </div>
+      <div class="mb-3">
+        <label for="foodtype" class="form-label">สินค้าที่ต้องการขาย</label>
+        <input type="text" class="form-control" id="foodtype" [(ngModel)]="bookingData.foodtype" name="foodtype" required>
+      </div>
+      <button type="submit" class="btn btn-primary">ลงทะเบียน</button>
+    </form>
+  </div>
+  
