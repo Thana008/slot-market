@@ -184,6 +184,18 @@ app.post('/api/bookings', async (req, res) => {
     res.status(500).json({ message: 'Error creating booking', error: error.message });
   }
 });
+app.get('/api/market_slots', async (req, res) => {
+  try {
+    const poolConnection = await pool(); // Get the current pool
+    // Change "available = 'true'" to "available = 1"
+    const result = await poolConnection.request().query('SELECT * FROM market_slots WHERE available = 1'); 
+
+    res.status(200).json(result.recordset); // Respond with the result
+  } catch (error) {
+    console.error('Error fetching market slots:', error);
+    res.status(500).json({ message: 'Server Error', error: error.message });
+  }
+});
 
 // Start the server
 const PORT = process.env.PORT || 3000;
