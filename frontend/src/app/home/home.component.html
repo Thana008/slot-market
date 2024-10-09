@@ -43,25 +43,42 @@
     </div>
 </section>
 
-<!-- ส่วนแสดงพื้นที่ว่าง (Available Spaces) -->
+<<!-- ส่วนแสดงพื้นที่ว่าง (Available Spaces) -->
 <section class="available-spaces py-5 bg-light">
     <div class="container">
         <h2 class="text-center mb-4">พื้นที่ว่าง</h2>
-        <div class="row">
-            <div class="col-md-4 mb-4" *ngFor="let space of availableSpaces">
-                <div class="card h-100">
-                    <img [src]="space.image" class="card-img-top" [alt]="space.name">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">{{ space.name }}</h5>
-                        <p class="card-text">{{ space.description }}</p>
-                        <p class="text-muted">สถานะ: ว่าง</p> <!-- แสดงสถานะพื้นที่ว่าง -->
-                        <!-- ไม่แสดงปุ่มลงทะเบียนความสนใจ -->
+        <div id="availableSpacesCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000"> <!-- Set auto-slide interval to 5000 ms (5 seconds) -->
+            <div class="carousel-inner">
+                <ng-container *ngFor="let group of (availableSpaces | slice:0:60) | chunk:3; let i = index">
+                    <div class="carousel-item" [class.active]="i === 0">
+                        <div class="row">
+                            <div class="col-md-4 mb-4" *ngFor="let space of group">
+                                <div class="card h-100">
+                                    <!-- ลบรูปภาพออก -->
+                                    <div class="card-body d-flex flex-column">
+                                        <h5 class="card-title">{{ space.slot_name }}</h5> <!-- แสดง slot_name -->
+                                        <p class="card-text">{{ space.description }}</p>
+                                        <p class="text-muted">สถานะ: ว่าง</p> <!-- แสดงสถานะพื้นที่ว่าง -->
+                                        <!-- ไม่แสดงปุ่มลงทะเบียนความสนใจ -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </ng-container>
             </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#availableSpacesCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#availableSpacesCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
         </div>
     </div>
 </section>
+
 
 <!-- ส่วนเกี่ยวกับเรา (About Us) -->
 <section class="about-us py-5">

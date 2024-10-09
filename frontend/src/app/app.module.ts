@@ -13,6 +13,7 @@ import { ManagementComponent } from './management/management.component';
 import { HttpClientModule } from '@angular/common/http';
 import { RegisterComponent } from './register/register.component';
 import { BookingDetailComponent } from './booking-detail/booking-detail.component';
+import { ChunkPipe } from './chunk.pipe';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { BookingDetailComponent } from './booking-detail/booking-detail.componen
     ContactComponent,
     ManagementComponent,
     RegisterComponent,
-    BookingDetailComponent
+    BookingDetailComponent,
+    ChunkPipe
   ],
   imports: [
     HttpClientModule,

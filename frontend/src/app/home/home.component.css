@@ -1,0 +1,27 @@
+.carousel {
+    position: relative; /* เพื่อให้ปุ่มสามารถถูกจัดตำแหน่งได้ */
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    position: absolute; /* ใช้ position absolute เพื่อจัดตำแหน่งปุ่ม */
+    top: 43%; /* ตั้งปุ่มไว้ที่กลางแนวตั้ง */
+    transform: translateY(-50%); /* ปรับตำแหน่งให้ปุ่มอยู่ตรงกลาง */
+    width: 40px; /* ขนาดของปุ่ม */
+    height: 40px; /* ขนาดของปุ่ม */
+    z-index: 10; /* ทำให้ปุ่มอยู่ข้างบนสุด */
+}
+
+.carousel-control-prev {
+    left: -50px; /* ย้ายปุ่ม Previous ออกจาก card */
+}
+
+.carousel-control-next {
+    right: -50px; /* ย้ายปุ่ม Next ออกจาก card */
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: black; /* สีของลูกศร */
+
+}
