@@ -1,0 +1,38 @@
+<div class="container mt-5">
+  <h2 class="text-center">User Profile</h2>
+  <div class="card mx-auto shadow" style="width: 24rem;">
+    <div class="card-header bg-primary text-white text-center">
+      <h4>User Profile</h4>
+    </div>
+    <div class="card-body text-center" *ngIf="!editMode; else editProfileTemplate">
+      <div class="profile-pic mb-3">
+        <img [src]="profileImage || 'https://via.placeholder.com/150'" alt="Profile" class="rounded-circle" width="150" height="150">
+      </div>
+
+      <h5 class="card-title">{{ name }}</h5>
+      <p>Email: <span>{{ email }}</span></p>
+      <p>Role: <span>{{ role }}</span></p>
+      <p>Booking Status: <span>{{ bookingStatus }}</span></p>
+      <p *ngIf="assignedSlot">Assigned Slot: <span>{{ assignedSlot }}</span></p>
+
+      <button *ngIf="bookingStatus === 'confirmed'" class="btn btn-danger mt-2" (click)="cancelBooking()">Cancel Booking</button>
+      
+      <button class="btn btn-primary mt-2" (click)="editMode = true">Edit Profile</button>
+    </div>
+    
+    <ng-template #editProfileTemplate>
+      <div class="card-body">
+        <div class="form-group mb-3">
+          <label for="name">Name</label>
+          <input type="text" id="name" [(ngModel)]="name" class="form-control">
+        </div>
+        <div class="form-group mb-3">
+          <label for="email">Email</label>
+          <input type="email" id="email" [(ngModel)]="email" class="form-control">
+        </div>
+        <button class="btn btn-success mt-2" (click)="updateProfile()">Save</button>
+        <button class="btn btn-secondary mt-2" (click)="editMode = false">Cancel</button>
+      </div>
+    </ng-template>
+  </div>
+</div>

@@ -24,7 +24,7 @@
         <a class="nav-link btn btn-dark me-2" routerLink="/login"><i class="bi bi-key"></i> Login</a>
       </li>
       <li class="nav-item" *ngIf="!isLoggedIn">
-        <a class="nav-link btn btn-success" routerLink="/signup"><i class="bi bi-person-fill-add"></i> Signup</a>
+        <a class="nav-link btn btn-success" routerLink="/register"><i class="bi bi-person-fill-add"></i> Register</a>
       </li>
     
       <!-- แสดงชื่อผู้ใช้และปุ่ม Logout เมื่อล็อกอินแล้ว -->
@@ -33,6 +33,7 @@
           Welcome, {{ username }}
         </a>
         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <li><a class="dropdown-item" routerLink="/profile">Profile</a></li>
           <li *ngIf="userRole === 'admin'">
             <a class="dropdown-item" routerLink="/management">Management</a>
           </li>

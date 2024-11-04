@@ -1,32 +1,84 @@
-<div class="container">
-    <h2>Manage Bookings</h2>
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Firstname</th>
-          <th>Lastname</th>
-          <th>Phone</th>
-          <th>Food Type</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let booking of bookings">
-          <td>{{ booking.id }}</td>
-          <td>{{ booking.firstname }}</td>
-          <td>{{ booking.lastname }}</td>
-          <td>{{ booking.phone }}</td>
-          <td>{{ booking.foodtype }}</td>
-          <td>{{ booking.status }}</td>
-          <td>
-            <button *ngIf="booking.status === 'pending'" (click)="updateStatus(booking.id, 'taste_test')" class="btn btn-info">Mark as Taste Test</button>
-            <button *ngIf="booking.status === 'taste_test'" (click)="updateStatus(booking.id, 'confirmed')" class="btn btn-success">Confirm</button>
-            <button (click)="updateStatus(booking.id, 'cancelled')" class="btn btn-danger">Cancel</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+<div class="container mt-5">
+  <h2 class="text-center">Manage Bookings</h2>
+  <table class="table table-bordered table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Firstname</th>
+        <th>Lastname</th>
+        <th>Phone</th>
+        <th>Food Type</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let booking of bookings">
+        <td>{{ booking.id }}</td>
+        <td>{{ booking.firstname }}</td>
+        <td>{{ booking.lastname }}</td>
+        <td>{{ booking.phone }}</td>
+        <td>{{ booking.foodtype }}</td>
+        <td>
+          <span [ngClass]="{
+              'badge bg-warning': booking.status === 'pending',
+              'badge bg-info': booking.status === 'taste_test',
+              'badge bg-success': booking.status === 'confirmed',
+              'badge bg-danger': booking.status === 'cancelled',
+              'badge bg-secondary': booking.status === 'not pass'
+            }">{{ booking.status }}</span>
+        </td>
+        <td>
+          <button *ngIf="booking.status === 'pending'" (click)="updateStatus(booking.id, 'taste_test')" class="btn btn-info">Mark as Taste Test</button>
+          <button *ngIf="booking.status === 'taste_test'" (click)="updateStatus(booking.id, 'confirmed')" class="btn btn-success">Confirm</button>
+          <button *ngIf="booking.status === 'taste_test'" (click)="updateStatus(booking.id, 'not pass')" class="btn btn-secondary">Not Pass</button>
+          <button *ngIf="booking.status !== 'cancelled'" (click)="updateStatus(booking.id, 'cancelled')" class="btn btn-danger">Cancel</button>
+          <button *ngIf="booking.status === 'cancelled'" (click)="deleteBooking(booking.id)" class="btn btn-danger">Delete</button>
+          <button *ngIf="booking.status === 'confirmed'" (click)="assignRandomSlot(booking.id)" class="btn btn-primary">Assign Slot</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Form for uploading documents -->
+  <h3 class="mt-4">Upload Document</h3>
+  <form (submit)="updateDocument()">
+    <div class="mb-3">
+      <label for="title" class="form-label">Document Title</label>
+      <input type="text" class="form-control" [(ngModel)]="title" name="title" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea class="form-control" [(ngModel)]="description" name="description" required></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label for="file" class="form-label">Select Document</label>
+      <input type="file" class="form-control" (change)="onFileSelected($event)" required>
+    </div>
+
+    <button type="submit" class="btn btn-success">Upload</button>
+  </form>
+
+  <!-- Document list -->
+  <h3 class="mt-4">Uploaded Documents</h3>
+  <div *ngFor="let document of documents" class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">{{ document.title }}</h5>
+      <p class="card-text">{{ document.description }}</p>
+      <a [href]="'http://localhost:3000/uploads/' + document.filename" class="btn btn-primary" download>Download</a>
+      <button class="btn btn-warning ms-2" (click)="onEditDocument(document)">Edit</button>
+      <button class="btn btn-danger ms-2" (click)="deleteDocument(document.id)">Delete</button>
+    </div>
   </div>
-  
+
+  <!-- Add input fields for editing title and description -->
+  <div *ngIf="editingDocument" class="mt-5">
+    <h3>Edit Document</h3>
+    <input type="text" class="form-control mb-3" [(ngModel)]="updatedTitle" placeholder="Enter new title">
+    <textarea class="form-control mb-3" [(ngModel)]="updatedDescription" placeholder="Enter new description"></textarea>
+    <input type="file" class="form-control mb-3" (change)="onFileSelected($event)">
+    <button class="btn btn-primary" (click)="updateDocument()">Save Changes</button>
+  </div>
+</div>

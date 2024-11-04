@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-booking-detail',
@@ -72,7 +74,27 @@ export class BookingDetailComponent implements OnInit {
   currentPage = 1;
   itemsPerPage = 10;
 
-  constructor() { }
+  constructor(private router: Router) { } // เพิ่ม Router ที่นี่
+
+  confirmBooking() {
+    Swal.fire({
+      title: 'ยืนยันการจองพื้นที่นี้หรือไม่?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'ยืนยัน',
+      cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // เมื่อยืนยัน ให้ไปหน้า booking
+        this.router.navigate(['/booking']);
+      } else if (result.isDismissed) {
+        // เมื่อยกเลิก ให้ไปหน้า booking-detail
+        this.router.navigate(['/booking-detail']);
+      }
+    });
+  }
 
   ngOnInit(): void {}
 

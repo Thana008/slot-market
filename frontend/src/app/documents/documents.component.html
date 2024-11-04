@@ -1,1 +1,17 @@
-<p>documents works!</p>
+<div class="container py-5">
+  <h2 class="text-center mb-4">Uploaded Documents</h2>
+  <div class="row">
+    <div class="col-md-4 mb-4" *ngFor="let document of documents">
+      <div class="card h-100">
+        <div *ngFor="let document of documents" class="card">
+          <div class="card-body">
+            <h5 class="card-title">{{ document.title }}</h5>
+            <p class="card-text">{{ document.description }}</p>
+            <!-- ปรับ URL ให้ถูกต้อง โดยดึงจาก 'document.filename' -->
+            <a [href]="'http://localhost:3000/uploads/' + document.filename" class="btn btn-primary" download>Download</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

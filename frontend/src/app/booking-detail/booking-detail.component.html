@@ -1,40 +1,43 @@
 <div class="container mt-4">
-    <div class="row" *ngFor="let slot of paginatedSlots">
-      <div class="col-12">
-        <div class="card mb-4">
-          <div class="row g-0">
-            <!-- Column for Image -->
-            <div class="col-md-6">
-              <img [src]="slot.image" class="img-fluid rounded-start" alt="Slot Image">
-            </div>
-            <!-- Column for Text -->
-            <div class="col-md-4">
-              <div class="card-body">
-                <h5 class="card-title">{{ slot.name }}</h5>
-                <p class="card-text">Slot: <span class="text-success">{{ slot.id }}</span></p>
-                <p class="card-text">ขนาดพื้นที่: {{ slot.size }}</p>
-                <!-- Booking Button -->
-                <button class="btn btn-primary" routerLink="/booking">จองพื้นที่นี้</button>
-              </div>
+  <div class="row" *ngFor="let slot of paginatedSlots">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="row g-0">
+          <!-- Column for Image -->
+          <div class="col-md-6">
+            <img [src]="slot.image" class="img-fluid rounded-start" alt="Slot Image">
+          </div>
+          <!-- Column for Text -->
+          <div class="col-md-4">
+            <div class="card-body">
+              <h5 class="card-title">{{ slot.name }}</h5>
+              <p class="card-text">Slot: <span class="text-success">{{ slot.id }}</span></p>
+              <p class="card-text">ขนาดพื้นที่: {{ slot.size }}</p>
             </div>
           </div>
         </div>
       </div>
     </div>
-  
-    <!-- Pagination Controls -->
-    <nav aria-label="Page navigation example">
-      <ul class="pagination">
-        <li class="page-item" [class.disabled]="currentPage === 1">
-          <a class="page-link" href="#" (click)="goToPage(currentPage - 1); $event.preventDefault()">Previous</a>
-        </li>
-        <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index" 
-            [class.active]="currentPage === i + 1">
-          <a class="page-link" href="#" (click)="goToPage(i + 1); $event.preventDefault()">{{ i + 1 }}</a>
-        </li>
-        <li class="page-item" [class.disabled]="currentPage === totalPages">
-          <a class="page-link" href="#" (click)="goToPage(currentPage + 1); $event.preventDefault()">Next</a>
-        </li>
-      </ul>
-    </nav>
   </div>
+
+  <!-- Booking Button (Centered) -->
+  <div class="text-center mt-4">
+      <button class="btn btn-primary" routerLink="/booking" (click)="confirmBooking()">จองพื้นที่นี้</button>
+  </div>
+
+  <!-- Pagination Controls -->
+  <nav aria-label="Page navigation example" class="d-flex justify-content-center mt-3">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" href="#" (click)="goToPage(currentPage - 1); $event.preventDefault()">Previous</a>
+      </li>
+      <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index" 
+          [class.active]="currentPage === i + 1">
+        <a class="page-link" href="#" (click)="goToPage(i + 1); $event.preventDefault()">{{ i + 1 }}</a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a class="page-link" href="#" (click)="goToPage(currentPage + 1); $event.preventDefault()">Next</a>
+      </li>
+    </ul>
+  </nav>
+</div>
