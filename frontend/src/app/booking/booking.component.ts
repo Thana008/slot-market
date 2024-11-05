@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-booking',
@@ -20,15 +21,30 @@ export class BookingComponent {
 
   constructor(private http: HttpClient, private router: Router) { }
 
+  confirmBooking(): void {
+    Swal.fire({
+      title: 'ยืนยันการจอง',
+      text: 'คุณต้องการยืนยันการลงทะเบียนหรือไม่?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'ยืนยัน',
+      cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.submitBooking();
+      }
+    });
+  }
+
   submitBooking(): void {
     // ส่งข้อมูลการจองไปยัง backend
     this.http.post('http://localhost:3000/api/bookings', this.bookingData)
       .subscribe(response => {
-        alert('ลงทะเบียนสำเร็จ!');
+        Swal.fire('สำเร็จ!', 'ลงทะเบียนสำเร็จ!', 'success');
         this.router.navigate(['/']); // กลับไปยังหน้าแรกหลังจากสำเร็จ
       }, error => {
         console.error('Error:', error);
-        alert('เกิดข้อผิดพลาดในการลงทะเบียน');
+        Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถลงทะเบียนได้', 'error');
       });
   }
 }

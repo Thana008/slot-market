@@ -76,25 +76,25 @@ export class BookingDetailComponent implements OnInit {
 
   constructor(private router: Router) { } // เพิ่ม Router ที่นี่
 
-  confirmBooking() {
-    Swal.fire({
-      title: 'ยืนยันการจองพื้นที่นี้หรือไม่?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'ยืนยัน',
-      cancelButtonText: 'ยกเลิก'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // เมื่อยืนยัน ให้ไปหน้า booking
-        this.router.navigate(['/booking']);
-      } else if (result.isDismissed) {
-        // เมื่อยกเลิก ให้ไปหน้า booking-detail
-        this.router.navigate(['/booking-detail']);
-      }
-    });
-  }
+  // confirmBooking() {
+  //   Swal.fire({
+  //     title: 'ยืนยันการจองพื้นที่นี้หรือไม่?',
+  //     icon: 'question',
+  //     showCancelButton: true,
+  //     confirmButtonColor: '#3085d6',
+  //     cancelButtonColor: '#d33',
+  //     confirmButtonText: 'ยืนยัน',
+  //     cancelButtonText: 'ยกเลิก'
+  //   }).then((result) => {
+  //     if (result.isConfirmed) {
+  //       // เมื่อยืนยัน ให้ไปหน้า booking
+  //       this.router.navigate(['/booking']);
+  //     } else if (result.isDismissed) {
+  //       // เมื่อยกเลิก ให้ไปหน้า booking-detail
+  //       this.router.navigate(['/booking-detail']);
+  //     }
+  //   });
+  // }
 
   ngOnInit(): void {}
 

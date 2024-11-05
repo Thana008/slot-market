@@ -1,23 +1,26 @@
 <div class="container mt-4">
-    <h2>แบบฟอร์มสนใจขายของในตลาด</h2>
-    <form (ngSubmit)="submitBooking()">
-      <div class="mb-3">
-        <label for="firstname" class="form-label">ชื่อ</label>
-        <input type="text" class="form-control" id="firstname" [(ngModel)]="bookingData.firstname" name="firstname" required>
-      </div>
-      <div class="mb-3">
-        <label for="lastname" class="form-label">นามสกุล</label>
-        <input type="text" class="form-control" id="lastname" [(ngModel)]="bookingData.lastname" name="lastname" required>
-      </div>
-      <div class="mb-3">
-        <label for="phone" class="form-label">เบอร์โทรติดต่อ</label>
-        <input type="text" class="form-control" id="phone" [(ngModel)]="bookingData.phone" name="phone" required>
-      </div>
-      <div class="mb-3">
-        <label for="foodtype" class="form-label">สินค้าที่ต้องการขาย</label>
-        <input type="text" class="form-control" id="foodtype" [(ngModel)]="bookingData.foodtype" name="foodtype" required>
-      </div>
-      <button type="submit" class="btn btn-primary">ลงทะเบียน</button>
-    </form>
-  </div>
-  
+  <h2>แบบฟอร์มสนใจขายของในตลาด</h2>
+  <form #bookingForm="ngForm" (ngSubmit)="submitBooking()">
+    <div class="mb-3">
+      <label for="firstname" class="form-label">ชื่อ</label>
+      <input type="text" class="form-control" id="firstname" [(ngModel)]="bookingData.firstname" name="firstname" required>
+      <div *ngIf="bookingForm.submitted && !bookingData.firstname" class="text-danger">กรุณากรอกชื่อ</div>
+    </div>
+    <div class="mb-3">
+      <label for="lastname" class="form-label">นามสกุล</label>
+      <input type="text" class="form-control" id="lastname" [(ngModel)]="bookingData.lastname" name="lastname" required>
+      <div *ngIf="bookingForm.submitted && !bookingData.lastname" class="text-danger">กรุณากรอกนามสกุล</div>
+    </div>
+    <div class="mb-3">
+      <label for="phone" class="form-label">เบอร์โทรติดต่อ</label>
+      <input type="text" class="form-control" id="phone" [(ngModel)]="bookingData.phone" name="phone" required>
+      <div *ngIf="bookingForm.submitted && !bookingData.phone" class="text-danger">กรุณากรอกเบอร์โทรติดต่อ</div>
+    </div>
+    <div class="mb-3">
+      <label for="foodtype" class="form-label">สินค้าที่ต้องการขาย</label>
+      <input type="text" class="form-control" id="foodtype" [(ngModel)]="bookingData.foodtype" name="foodtype" required>
+      <div *ngIf="bookingForm.submitted && !bookingData.foodtype" class="text-danger">กรุณากรอกสินค้าที่ต้องการขาย</div>
+    </div>
+    <button type="button" class="btn btn-primary" (click)="confirmBooking()" [disabled]="!bookingForm.valid">ลงทะเบียน</button>
+  </form>
+</div>
