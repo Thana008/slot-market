@@ -1,25 +1,23 @@
-<div class="container">
-  <h2>Payments</h2>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Amount</th>
-        <th>Due Date</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let payment of payments">
-        <td>{{ payment.id }}</td>
-        <td>{{ payment.amount }}</td>
-        <td>{{ payment.due_date }}</td>
-        <td>{{ payment.status }}</td>
-        <td>
-          <button *ngIf="payment.status === 'pending'" (click)="pay(payment.id)" class="btn btn-primary">Pay Now</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+<div class="container mt-5">
+  <div class="card mx-auto shadow" style="width: 36rem;">
+    <div class="card-header bg-warning text-white text-center">
+      <h4>Payment Information</h4>
+    </div>
+    <div class="card-body">
+      <div *ngIf="booking">
+        <p>Booking ID: <span>{{ booking.id }}</span></p>
+        <p>Firstname: <span>{{ booking.firstname }}</span></p>
+        <p>Lastname: <span>{{ booking.lastname }}</span></p>
+        <p>Food Type: <span>{{ booking.foodtype }}</span></p>
+        <p>Slot: <span>{{ booking.slot_name }}</span></p> 
+        <p>Total Amount: <span>{{ booking.total_amount }} THB</span></p>
+
+        <div class="mt-4">
+          <img src="assets/payment.png">
+        </div>
+
+        <button class="btn btn-primary mt-4" (click)="confirmPayment()">Confirm Payment</button>
+      </div>
+    </div>
+  </div>
 </div>

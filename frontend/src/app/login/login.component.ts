@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http'; // ตรวจสอบให้แน่ใจว่า HttpClient ถูก import แล้ว
+import { HttpClient } from '@angular/common/http';
+import Swal from 'sweetalert2'; // Import SweetAlert
 
 @Component({
   selector: 'app-login',
@@ -28,6 +29,15 @@ export class LoginComponent {
         localStorage.setItem('username', response.user.username);
         localStorage.setItem('role', response.user.role);
 
+        // แสดงการแจ้งเตือนเมื่อเข้าสู่ระบบสำเร็จ
+        Swal.fire({
+          icon: 'success',
+          title: 'Login Successful',
+          text: `Welcome back, ${response.user.username}!`,
+          showConfirmButton: false,
+          timer: 1500
+        });
+
         // นำผู้ใช้ไปยัง dashboard ที่เหมาะสมตาม role
         if (response.user.role === 'admin') {
           this.router.navigate(['/management']);
@@ -37,7 +47,13 @@ export class LoginComponent {
       },
       error => {
         console.error('การล็อกอินล้มเหลว', error);
-        alert('การล็อกอินล้มเหลว โปรดตรวจสอบข้อมูลแล้วลองอีกครั้ง');
+
+        // แสดงการแจ้งเตือนเมื่อเข้าสู่ระบบล้มเหลว
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Failed',
+          text: 'กรุณาตรวจสอบข้อมูลแล้วลองอีกครั้ง',
+        });
       }
     );
   }

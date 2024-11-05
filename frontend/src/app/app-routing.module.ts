@@ -10,7 +10,7 @@ import { RegisterComponent } from './register/register.component';
 import { BookingDetailComponent } from './booking-detail/booking-detail.component';
 import { AuthGuard } from './auth.guard';
 import { ProfileComponent } from './profile/profile.component';
-import { PaymentsComponent } from './payment/payment.component';
+import { PaymentComponent } from './payment/payment.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' }, // เส้นทางเริ่มต้น, ถ้าไม่มีเส้นทางจะไปที่ Home
@@ -22,7 +22,7 @@ const routes: Routes = [
   { path: 'documents', component: DocumentsComponent },
   { path: 'contact', component: ContactComponent },
   { path: 'profile', component: ProfileComponent  },
-  { path: 'payments', component: PaymentsComponent  },
+  { path: 'payments', component: PaymentComponent  },
   { path: 'management', component: ManagementComponent, canActivate: [AuthGuard]  },
   { path: '**', redirectTo: '/home' }, // ถ้าเส้นทางไม่ถูกต้อง, จะเปลี่ยนไปที่ Home
 ];

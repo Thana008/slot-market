@@ -15,7 +15,7 @@ import { RegisterComponent } from './register/register.component';
 import { BookingDetailComponent } from './booking-detail/booking-detail.component';
 import { ChunkPipe } from './chunk.pipe';
 import { ProfileComponent } from './profile/profile.component';
-import { PaymentsComponent } from './payment/payment.component';
+import { PaymentComponent } from './payment/payment.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +30,7 @@ import { PaymentsComponent } from './payment/payment.component';
     BookingDetailComponent,
     ChunkPipe,
     ProfileComponent,
-    PaymentsComponent,
+    PaymentComponent,
   ],
   imports: [
     HttpClientModule,

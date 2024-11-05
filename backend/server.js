@@ -26,6 +26,93 @@ connectToDatabase().catch(err => {
   console.error('Database connection failed:', err);
 });
 
+app.get('/api/bookings/:bookingId', authenticateToken, async (req, res) => {
+  const { bookingId } = req.params;
+
+  try {
+    const poolConnection = await pool(); // เชื่อมต่อกับฐานข้อมูล
+
+    // Query to get booking details along with the slot price
+    const result = await poolConnection.request()
+      .input('bookingId', sql.Int, bookingId)
+      .query(`
+        SELECT 
+          b.id AS booking_id,
+          b.firstname,
+          b.lastname,
+          b.foodtype,
+          b.payment_status,
+          b.status,
+          ms.price AS total_amount,
+          b.booking_date
+        FROM 
+          bookings b
+        INNER JOIN 
+          market_slots ms ON b.slot_id = ms.id
+        WHERE 
+          b.id = @bookingId
+      `);
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ message: 'No booking found with the provided booking ID' });
+    }
+
+    res.status(200).json(result.recordset[0]);
+  } catch (error) {
+    console.error('Error fetching booking details:', error);
+    res.status(500).json({ message: 'Error fetching booking details', error: error.message });
+  }
+});
+
+
+app.post('/api/update-profile', authenticateToken, async (req, res) => {
+  const { username, email, currentPassword, newPassword } = req.body;
+  const userId = req.user.id;
+
+  try {
+    const poolConnection = await pool();
+
+    // ตรวจสอบรหัสผ่านปัจจุบันถ้ามีการเปลี่ยนแปลงรหัสผ่าน
+    if (newPassword) {
+      const userResult = await poolConnection.request()
+        .input('userId', sql.Int, userId)
+        .query('SELECT password FROM users WHERE id = @userId');
+
+      if (userResult.recordset.length === 0) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      const validPassword = await bcrypt.compare(currentPassword, userResult.recordset[0].password);
+      if (!validPassword) {
+        return res.status(400).json({ message: 'Current password is incorrect' });
+      }
+    }
+
+    // อัพเดตข้อมูลโปรไฟล์
+    let hashedPassword = null;
+    if (newPassword) {
+      hashedPassword = await bcrypt.hash(newPassword, 10);
+    }
+
+    const request = poolConnection.request()
+      .input('username', sql.VarChar, username)
+      .input('email', sql.VarChar, email)
+      .input('id', sql.Int, userId);
+
+    if (hashedPassword) {
+      request.input('password', sql.VarChar, hashedPassword);
+      await request.query('UPDATE users SET username = @username, email = @email, password = @password WHERE id = @id');
+    } else {
+      await request.query('UPDATE users SET username = @username, email = @email WHERE id = @id');
+    }
+
+    res.status(200).json({ message: 'Profile updated successfully' });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    res.status(500).json({ message: 'Error updating profile', error: error.message });
+  }
+});
+
 // Registration Endpoint
 app.post('/auth/register', async (req, res) => {
   const { username, email, password, role } = req.body;
@@ -52,7 +139,7 @@ app.post('/auth/register', async (req, res) => {
 
     // Execute the query
     await request.query(query);
-    
+
     res.status(201).json({ message: 'User registered successfully' });
   } catch (err) {
     console.error('Error registering user:', err);
@@ -60,23 +147,79 @@ app.post('/auth/register', async (req, res) => {
   }
 });
 
-app.get('/api/getUserBookingStatus/:userId', authenticateToken, async (req, res) => {
+
+// ตรวจสอบ username ในฐานข้อมูล
+app.get('/api/check-username', async (req, res) => {
+  const { username, userId } = req.query;
+
+  try {
+    const poolConnection = await pool(); // เชื่อมต่อกับฐานข้อมูล
+    const request = poolConnection.request()
+      .input('username', sql.VarChar, username)
+      .input('userId', sql.Int, userId);
+
+    const result = await request.query(`
+      SELECT COUNT(*) AS count 
+      FROM users 
+      WHERE username = @username AND id != @userId
+    `);
+
+    if (result.recordset[0].count > 0) {
+      return res.status(200).json({ exists: true });
+    } else {
+      return res.status(200).json({ exists: false });
+    }
+  } catch (error) {
+    console.error('Error checking username:', error);
+    res.status(500).json({ message: 'Error checking username', error: error.message });
+  }
+});
+
+app.get('/api/getUserBookings/:userId', authenticateToken, async (req, res) => {
   const { userId } = req.params;
 
   try {
-      const poolConnection = await pool();
-      const result = await poolConnection.request()
-          .input('userId', sql.Int, userId)
-          .query('SELECT status FROM bookings WHERE user_id = @userId ORDER BY created_at DESC');
+    const poolConnection = await pool(); // Connect to the database
 
-      if (result.recordset.length === 0) {
-          return res.status(200).json({ status: 'nothing' }); // ไม่มีข้อมูลการจอง
-      }
+    // SQL query to retrieve booking details along with the slot name
+    const result = await poolConnection.request()
+      .input('userId', sql.Int, userId)
+      .query(`
+        SELECT 
+          b.id, 
+          b.status, 
+          b.firstname, 
+          b.lastname, 
+          b.payment_status, 
+          b.foodtype, 
+          b.slot_id, 
+          ms.slot_name 
+        FROM bookings b
+        LEFT JOIN market_slots ms ON b.slot_id = ms.id
+        WHERE b.user_id = @userId
+        ORDER BY b.created_at DESC
+      `);
 
-      res.status(200).json({ status: result.recordset[0].status }); // ส่งสถานะการจองกลับไป
+    if (result.recordset.length === 0) {
+      return res.status(200).json({ status: 'nothing' }); // No booking data found
+    }
+
+    const booking = result.recordset[0];
+
+    res.status(200).json({
+      id: booking.id,
+      status: booking.status,
+      firstname: booking.firstname,
+      lastname: booking.lastname,
+      payment_status: booking.payment_status,
+      foodtype: booking.foodtype,
+      slot_id: booking.slot_id,
+      slot_name: booking.slot_name 
+    });
+
   } catch (error) {
-      console.error('Error fetching booking status:', error);
-      res.status(500).json({ message: 'Error fetching booking status', error: error.message });
+    console.error('Error fetching booking status:', error);
+    res.status(500).json({ message: 'Error fetching booking status', error: error.message });
   }
 });
 
@@ -281,64 +424,118 @@ app.get('/api/documents', async (req, res) => {
   }
 });
 
-app.post('/api/update-profile', authenticateToken, async (req, res) => {
-  const { name, email } = req.body;
-  const userId = req.user.id; // รับ ID ของผู้ใช้จาก token
-  
-  // Debugging logs
-  console.log('User ID:', userId);
-  console.log('Name:', name, 'Email:', email);
-
-  try {
-    const poolConnection = await pool(); // เชื่อมต่อกับฐานข้อมูล
-    const request = poolConnection.request()
-      .input('name', sql.VarChar, name)
-      .input('email', sql.VarChar, email)
-      .input('id', sql.Int, userId);
-
-    const result = await request.query('UPDATE users SET name = @name, email = @email WHERE id = @id');
-
-    console.log('Query Result:', result); // ดูผลลัพธ์ของ query
-    res.status(200).json({ message: 'Profile updated successfully' });
-  } catch (error) {
-    console.error('Error updating profile:', error); // แสดงข้อผิดพลาดใน console
-    res.status(500).json({ message: 'Error updating profile', error: error.message });
-  }
-});
 
 // ดึงสถานะการจ่ายเงิน
 app.get('/api/payments/:userId', authenticateToken, async (req, res) => {
   const { userId } = req.params;
   try {
-      const poolConnection = await pool();
-      const result = await poolConnection.request()
-          .input('userId', sql.Int, userId)
-          .query('SELECT * FROM payments WHERE user_id = @userId');
-      res.status(200).json(result.recordset);
+    const poolConnection = await pool();
+    const result = await poolConnection.request()
+      .input('userId', sql.Int, userId)
+      .query('SELECT * FROM payments WHERE user_id = @userId');
+    res.status(200).json(result.recordset);
   } catch (error) {
-      console.error('Error fetching payments:', error);
-      res.status(500).json({ message: 'Error fetching payments' });
+    console.error('Error fetching payments:', error);
+    res.status(500).json({ message: 'Error fetching payments' });
   }
 });
 
+const PDFDocument = require('pdfkit');
 
-// ชำระเงิน
-app.post('/api/payments/:userId/pay', authenticateToken, async (req, res) => {
+app.get('/api/receipt/:userId', authenticateToken, async (req, res) => {
   const { userId } = req.params;
-  const { paymentId } = req.body; // รหัสการชำระเงิน
+
   try {
-      const poolConnection = await pool();
-      await poolConnection.request()
-          .input('userId', sql.Int, userId)
-          .input('paymentId', sql.Int, paymentId)
-          .input('paymentDate', sql.Date, new Date())
-          .query('UPDATE payments SET status = \'paid\', payment_date = @paymentDate WHERE id = @paymentId AND user_id = @userId');
-      res.status(200).json({ message: 'Payment successful' });
+    const poolConnection = await pool();
+
+    // Query to get booking details along with the slot price and slot name
+    const result = await poolConnection.request()
+      .input('userId', sql.Int, userId)
+      .query(`
+        SELECT 
+          b.id AS booking_id,
+          b.firstname,
+          b.lastname,
+          b.foodtype,
+          b.payment_status,
+          ms.price AS total_amount,
+          ms.slot_name,
+          b.booking_date
+        FROM 
+          bookings b
+        INNER JOIN 
+          market_slots ms ON b.slot_id = ms.id
+        WHERE 
+          b.user_id = @userId
+        ORDER BY 
+          b.booking_date DESC
+      `);
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ message: 'No booking found for the user' });
+    }
+
+    // สร้าง PDF ด้วย pdfkit
+    const PDFDocument = require('pdfkit');
+    const doc = new PDFDocument();
+    let filename = `Receipt_Booking_${userId}.pdf`;
+    filename = encodeURIComponent(filename);
+    
+    res.setHeader('Content-disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-type', 'application/pdf');
+
+    const booking = result.recordset[0];
+    doc.text('Receipt');
+    doc.text(`Booking ID: ${booking.booking_id}`);
+    doc.text(`Name: ${booking.firstname} ${booking.lastname}`);
+    doc.text(`Food Type: ${booking.foodtype}`);
+    doc.text(`Slot: ${booking.slot_name}`);
+    doc.text(`Payment Status: ${booking.payment_status}`);
+    doc.text(`Total Amount: ${booking.total_amount} THB`);
+    doc.text(`Booking Date: ${booking.booking_date}`);
+
+    doc.pipe(res);
+    doc.end();
+
   } catch (error) {
-      console.error('Error updating payment:', error);
-      res.status(500).json({ message: 'Error updating payment' });
+    console.error('Error generating receipt:', error);
+    res.status(500).json({ message: 'Error generating receipt', error: error.message });
   }
 });
+
+
+
+
+app.post('/api/payments', authenticateToken, async (req, res) => {
+  const { bookingId, paymentMethod } = req.body;
+
+  if (!bookingId || !paymentMethod) {
+    return res.status(400).json({ message: 'Booking ID and payment method are required.' });
+  }
+
+  try {
+    const poolConnection = await pool();
+    const bookingCheck = await poolConnection.request()
+      .input('bookingId', sql.Int, bookingId)
+      .query('SELECT * FROM bookings WHERE id = @bookingId');
+
+    if (bookingCheck.recordset.length === 0) {
+      return res.status(400).json({ message: 'Booking not found.' });
+    }
+
+    // อัปเดตสถานะการชำระเงิน
+    await poolConnection.request()
+      .input('bookingId', sql.Int, bookingId)
+      .input('paymentStatus', sql.VarChar(20), 'paid')
+      .query('UPDATE bookings SET payment_status = @paymentStatus WHERE id = @bookingId');
+
+    res.status(200).json({ message: 'Payment processed successfully.' });
+  } catch (error) {
+    console.error('Error processing payment:', error);
+    res.status(500).json({ message: 'Error processing payment', error: error.message });
+  }
+});
+
 
 // Delete booking by ID
 app.delete('/api/bookings/:id', authenticateToken, async (req, res) => {
@@ -360,68 +557,6 @@ app.delete('/api/bookings/:id', authenticateToken, async (req, res) => {
     res.status(500).json({ message: 'Error deleting booking', error: error.message });
   }
 });
-
-app.post('/api/admin/assignSlot', authenticateToken, async (req, res) => {
-  console.log('Received userId:', req.body.userId); // ตรวจสอบค่าที่รับมา
-  console.log('Authenticated user:', req.user); // ตรวจสอบข้อมูล user จาก token
-
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Only admin can assign slots' });
-  }
-
-  const { userId } = req.body;
-
-  // ตรวจสอบค่า userId
-  if (!userId || typeof userId !== 'number') {
-    console.log('Invalid userId:', userId);
-    return res.status(400).json({ message: 'Invalid userId provided.' });
-  }
-
-  try {
-    const poolConnection = await pool();
-
-    // ตรวจสอบการจองที่ยืนยันแล้ว
-    const confirmedUser = await poolConnection.request()
-      .input('userId', sql.Int, userId)
-      .query('SELECT * FROM bookings WHERE user_id = @userId AND status = \'confirmed\'');
-
-    console.log('Confirmed User:', confirmedUser.recordset); // ตรวจสอบผลลัพธ์หลังจากกำหนดค่า confirmedUser
-
-    if (confirmedUser.recordset.length === 0) {
-      return res.status(400).json({ message: 'No confirmed booking found for this user.' });
-    }
-
-    // สุ่ม slot ที่ว่าง
-    const availableSlot = await poolConnection.request()
-      .query('SELECT TOP 1 * FROM market_slots WHERE available = 1 ORDER BY NEWID()');
-
-    console.log('Available Slot:', availableSlot.recordset); // ดูผลลัพธ์ของ query
-
-    if (availableSlot.recordset.length === 0) {
-      return res.status(400).json({ message: 'No available slots found.' });
-    }
-
-    const slotId = availableSlot.recordset[0].id;
-    const slotName = availableSlot.recordset[0].slot_name;
-
-    // อัปเดตสถานะ slot เป็นไม่ว่าง
-    await poolConnection.request()
-      .input('slotId', sql.Int, slotId)
-      .query('UPDATE market_slots SET available = 0 WHERE id = @slotId');
-
-    // อัปเดต booking ด้วย slot_id
-    await poolConnection.request()
-      .input('slotId', sql.Int, slotId)
-      .input('userId', sql.Int, userId)
-      .query('UPDATE bookings SET slot_id = @slotId WHERE user_id = @userId');
-
-    res.status(200).json({ message: 'Slot assigned successfully', slotName });
-  } catch (error) {
-    console.error('Error assigning slot:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-});
-
 
 app.post('/api/payments/:userId/pay', authenticateToken, async (req, res) => {
   const { userId } = req.params;
@@ -484,6 +619,35 @@ app.post('/auth/login', async (req, res) => {
     res.status(500).json({ message: 'Login failed', error: err.message });
   }
 });
+app.get('/api/bookings/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const poolConnection = await pool();
+    const result = await poolConnection.request()
+      .input('id', sql.Int, id)
+      .query(`
+        SELECT 
+          b.*, 
+          ms.slot_name, 
+          ms.price AS slot_price 
+        FROM 
+          bookings b 
+        LEFT JOIN 
+          market_slots ms ON b.slot_id = ms.id 
+        WHERE 
+          b.id = @id
+      `);
+    
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+    
+    res.status(200).json(result.recordset[0]);
+  } catch (error) {
+    console.error('Error fetching booking:', error);
+    res.status(500).json({ message: 'Error fetching booking', error: error.message });
+  }
+});
 
 // Get all bookings
 app.get('/api/bookings', async (req, res) => {
@@ -498,7 +662,6 @@ app.get('/api/bookings', async (req, res) => {
   }
 });
 
-// Update booking status
 app.put('/api/bookings/:id/status', async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -506,14 +669,31 @@ app.put('/api/bookings/:id/status', async (req, res) => {
   const validStatuses = ['taste_test', 'confirmed', 'not pass', 'cancelled']; // เพิ่ม 'not pass'
 
   // ตรวจสอบสถานะใหม่
-if (!validStatuses.includes(status)) {
-  return res.status(400).json({ message: 'Invalid status' });
-}
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ message: 'Invalid status' });
+  }
 
   try {
     const poolConnection = await pool(); // Get pool connection
 
-    // Update the status of the booking
+    // หากสถานะเป็น 'cancelled' จะทำให้ slot กลับมาเป็นว่าง
+    if (status === 'cancelled') {
+      // ดึงข้อมูล slot_id ที่เกี่ยวข้องกับการจองนี้
+      const bookingResult = await poolConnection.request()
+        .input('id', sql.Int, id)
+        .query('SELECT slot_id FROM bookings WHERE id = @id');
+
+      const slotId = bookingResult.recordset[0]?.slot_id;
+
+      if (slotId) {
+        // ทำให้ slot ที่เคยถูกใช้กลับมาเป็นว่าง
+        await poolConnection.request()
+          .input('slotId', sql.Int, slotId)
+          .query('UPDATE market_slots SET available = 1 WHERE id = @slotId');
+      }
+    }
+
+    // อัปเดตสถานะการจอง
     await poolConnection.request()
       .input('id', sql.Int, id)
       .input('status', sql.VarChar(20), status)
@@ -527,15 +707,96 @@ if (!validStatuses.includes(status)) {
 });
 
 
+app.post('/api/admin/assignSlot', authenticateToken, async (req, res) => {
+  let { Id, slotId } = req.body;
+
+  // แปลงค่า Id และ slotId เป็นตัวเลข
+  Id = parseInt(Id);
+  slotId = parseInt(slotId);
+
+  if (isNaN(Id) || isNaN(slotId)) {
+    return res.status(400).json({ success: false, message: 'Id and SlotId must be numeric values' });
+  }
+
+  console.log('Assigning slot:', { Id, slotId });
+
+  try {
+    const poolConnection = await pool();
+
+    // ตรวจสอบการจองที่ยืนยันแล้วสำหรับ Id นี้หรือไม่
+    const confirmedBooking = await poolConnection.request()
+      .input('Id', sql.Int, Id)
+      .query('SELECT * FROM bookings WHERE id = @Id AND status = \'confirmed\'');
+
+    console.log('Confirmed booking:', confirmedBooking.recordset);
+
+    if (confirmedBooking.recordset.length === 0) {
+      return res.status(400).json({ success: false, message: 'No confirmed booking found for this booking id.' });
+    }
+
+    // ตรวจสอบ slot ที่ต้องการ assign ว่างอยู่หรือไม่
+    const slotCheck = await poolConnection.request()
+      .input('slotId', sql.Int, slotId)
+      .query('SELECT * FROM market_slots WHERE id = @slotId AND available = 1');
+
+    console.log('Slot availability:', slotCheck.recordset);
+
+    if (slotCheck.recordset.length === 0) {
+      return res.status(400).json({ success: false, message: 'Selected slot is not available.' });
+    }
+
+    // หากการจองนี้มี slot_id เดิมอยู่แล้ว ต้องคืนสถานะให้ slot เก่าเป็น available
+    if (confirmedBooking.recordset[0].slot_id) {
+      const oldSlotId = confirmedBooking.recordset[0].slot_id;
+
+      // อัปเดต slot เก่าให้ว่าง
+      await poolConnection.request()
+        .input('oldSlotId', sql.Int, oldSlotId)
+        .query('UPDATE market_slots SET available = 1 WHERE id = @oldSlotId');
+    }
+
+    // อัปเดตสถานะ slot ที่เลือกใหม่เป็นไม่ว่าง
+    await poolConnection.request()
+      .input('slotId', sql.Int, slotId)
+      .query('UPDATE market_slots SET available = 0 WHERE id = @slotId');
+
+    // อัปเดต booking ด้วย slot_id ใหม่
+    await poolConnection.request()
+      .input('slotId', sql.Int, slotId)
+      .input('Id', sql.Int, Id)
+      .query('UPDATE bookings SET slot_id = @slotId WHERE id = @Id');
+
+    res.status(200).json({ success: true, message: 'Slot assigned successfully' });
+  } catch (error) {
+    console.error('Error assigning slot:', error);
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+});
+
+
+
+// ดึงข้อมูล slot ที่ว่างทั้งหมด
+app.get('/api/slots/available', authenticateToken, async (req, res) => {
+  try {
+    const poolConnection = await pool();
+    const availableSlots = await poolConnection.request()
+      .query('SELECT * FROM market_slots WHERE available = 1');
+    res.status(200).json(availableSlots.recordset);
+  } catch (error) {
+    console.error('Error fetching available slots:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 
 // Create Booking
 app.post('/api/bookings', async (req, res) => {
   try {
-    const { user_id, slot_id, booking_date, status, payment_status, firstname, lastname, phone, foodtype } = req.body;
+    const { user_id, booking_date, status, payment_status, firstname, lastname, phone, foodtype } = req.body;
 
     // Validate the request body
-    if (!user_id || !slot_id || !booking_date) {
-      return res.status(400).json({ message: 'user_id, slot_id, and booking_date are required fields.' });
+    if (!user_id || !booking_date) {
+      return res.status(400).json({ message: 'user_id and booking_date are required fields.' });
     }
 
     const poolConnection = await pool(); // Get the current pool
@@ -546,7 +807,16 @@ app.post('/api/bookings', async (req, res) => {
       .query('SELECT id FROM users WHERE id = @user_id');
 
     if (userCheck.recordset.length === 0) {
-      return res.status(400).json({ message: 'User ID does not exist' });
+      return res.status(400).json({ message: 'User ID does not exist.' });
+    }
+
+    // Check if user already has an active booking
+    const existingBooking = await poolConnection.request()
+      .input('user_id', sql.Int, user_id)
+      .query('SELECT * FROM bookings WHERE user_id = @user_id AND status != \'cancelled\'');
+
+    if (existingBooking.recordset.length > 0) {
+      return res.status(400).json({ message: 'User already has an active booking.' });
     }
 
     // Convert the booking_date to UTC+7 if necessary
@@ -555,7 +825,6 @@ app.post('/api/bookings', async (req, res) => {
     // Insert the booking
     await poolConnection.request()
       .input('user_id', sql.Int, user_id)
-      .input('slot_id', sql.Int, slot_id)
       .input('booking_date', sql.DateTime, utcBookingDate)
       .input('status', sql.VarChar(20), status || 'pending')
       .input('payment_status', sql.VarChar(10), payment_status || 'pending')
@@ -564,21 +833,22 @@ app.post('/api/bookings', async (req, res) => {
       .input('phone', sql.VarChar(10), phone)
       .input('foodtype', sql.VarChar(100), foodtype)
       .query(`
-        INSERT INTO bookings (user_id, slot_id, booking_date, status, payment_status, firstname, lastname, phone, foodtype)
-        VALUES (@user_id, @slot_id, @booking_date, @status, @payment_status, @firstname, @lastname, @phone, @foodtype)
+        INSERT INTO bookings (user_id, booking_date, status, payment_status, firstname, lastname, phone, foodtype)
+        VALUES (@user_id, @booking_date, @status, @payment_status, @firstname, @lastname, @phone, @foodtype)
       `);
 
-    res.status(201).json({ message: 'Booking created successfully' });
+    res.status(201).json({ message: 'Booking created successfully.' });
   } catch (error) {
     console.error('Error creating booking:', error);
-    res.status(500).json({ message: 'Error creating booking', error: error.message });
+    res.status(500).json({ message: 'Error creating booking.', error: error.message });
   }
 });
+
 app.get('/api/market_slots', async (req, res) => {
   try {
     const poolConnection = await pool(); // Get the current pool
     // Change "available = 'true'" to "available = 1"
-    const result = await poolConnection.request().query('SELECT * FROM market_slots WHERE available = 1'); 
+    const result = await poolConnection.request().query('SELECT * FROM market_slots WHERE available = 1');
 
     res.status(200).json(result.recordset); // Respond with the result
   } catch (error) {

@@ -14,15 +14,27 @@ export class ManagementComponent implements OnInit {
   updatedTitle: string = '';  
   updatedDescription: string = '';  
   editingDocument: any = null;  
-
   bookings: any[] = []; 
   documents: any[] = []; 
+  availableSlots: any[] = [];
+  selectedSlot: { [key: number]: number } = {};
 
   constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
     this.getBookings(); 
     this.fetchDocuments(); 
+    this.getAvailableSlots();
+  }
+
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    if (token) {
+      return new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    } else {
+      Swal.fire('Error', 'No valid token found, please log in again.', 'error');
+      throw new Error('No valid token found'); 
+    }
   }
 
   onFileSelected(event: any): void {
@@ -37,81 +49,80 @@ export class ManagementComponent implements OnInit {
 
   getBookings(): void {
     this.http.get<any[]>('http://localhost:3000/api/bookings')
-      .subscribe(data => {
-        this.bookings = data;
-      }, error => {
-        console.error('Error fetching bookings', error);
-      });
-  }
-
-  fetchDocuments(): void {
-    this.http.get<any[]>('http://localhost:3000/api/documents').subscribe(
-      (data) => {
-        this.documents = data;
-      },
-      (error) => {
-        console.error('Error fetching documents:', error);
-      }
-    );
-  }
-
-  assignRandomSlot(bookingId: number): void {
-    console.log('Sending userId:', bookingId);  // เพิ่ม log เพื่อดูค่าที่ส่ง
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    
-    this.http.post<any>('http://localhost:3000/api/admin/assignSlot', { userId: bookingId }, { headers })
       .subscribe({
-        next: (response) => {
-          Swal.fire('Success', `Slot ${response.slotName} assigned successfully!`, 'success');
-          this.getBookings(); // Refresh the list
+        next: data => {
+          this.bookings = data;
         },
-        error: (error) => {
-          Swal.fire('Error!', 'Failed to assign a slot.', 'error');
-          console.error('Error assigning slot:', error);
+        error: error => {
+          console.error('Error fetching bookings', error);
         }
       });
   }
 
+  getAvailableSlots(): void {
+    const headers = this.getHeaders();  // ใช้ getHeaders เพื่อดึง token
+    this.http.get<any[]>('http://localhost:3000/api/slots/available', { headers })
+      .subscribe({
+        next: data => {
+          this.availableSlots = data;
+        },
+        error: error => {
+          console.error('Error fetching available slots', error);
+          Swal.fire('Error', 'Failed to fetch available slots. Please check your login status.', 'error');
+        }
+      });
+  }
+  
+
+  fetchDocuments(): void {
+    this.http.get<any[]>('http://localhost:3000/api/documents').subscribe({
+      next: (data) => {
+        this.documents = data;
+      },
+      error: (error) => {
+        console.error('Error fetching documents:', error);
+      }
+    });
+  }
 
   updateDocument(): void {
     const formData = new FormData();
     formData.append('title', this.updatedTitle || this.title);
     formData.append('description', this.updatedDescription || this.description);
-    
+
     if (this.selectedFile) {
       formData.append('document', this.selectedFile);
     }
-  
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-  
+
     const url = this.editingDocument 
       ? `http://localhost:3000/api/documents/${this.editingDocument.id}` 
       : 'http://localhost:3000/api/upload';
-  
-    this.http.put(url, formData, { headers })
-      .subscribe({
-        next: (response) => {
-          Swal.fire({
-            title: 'Success',
-            text: this.editingDocument ? 'Document updated successfully!' : 'Document uploaded successfully!',
-            icon: 'success',
-            confirmButtonText: 'OK'
-          });
-          this.fetchDocuments(); 
-        },
-        error: (err) => {
-          Swal.fire({
-            title: 'Error',
-            text: 'There was an error updating the document!',
-            icon: 'error',
-            confirmButtonText: 'OK'
-          });
-        }
-      });
+
+    const request$ = this.editingDocument
+      ? this.http.put(url, formData, { headers: this.getHeaders() })
+      : this.http.post(url, formData, { headers: this.getHeaders() });
+
+    request$.subscribe({
+      next: () => {
+        Swal.fire({
+          title: 'Success',
+          text: this.editingDocument ? 'Document updated successfully!' : 'Document uploaded successfully!',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        });
+        this.fetchDocuments(); 
+      },
+      error: () => {
+        Swal.fire({
+          title: 'Error',
+          text: 'There was an error updating/uploading the document!',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
+    });
   }
-  
+
   updateStatus(bookingId: number, status: string): void {
     const body = { status };
     this.http.put(`http://localhost:3000/api/bookings/${bookingId}/status`, body)
@@ -128,9 +139,6 @@ export class ManagementComponent implements OnInit {
   }
 
   deleteBooking(id: number): void {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-
     Swal.fire({
       title: 'Are you sure?',
       text: 'You will not be able to recover this booking!',
@@ -140,7 +148,7 @@ export class ManagementComponent implements OnInit {
       cancelButtonText: 'No, keep it'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.http.delete(`http://localhost:3000/api/bookings/${id}`, { headers })
+        this.http.delete(`http://localhost:3000/api/bookings/${id}`, { headers: this.getHeaders()})
           .subscribe({
             next: () => {
               Swal.fire('Deleted!', 'Your booking has been deleted.', 'success');
@@ -167,50 +175,48 @@ export class ManagementComponent implements OnInit {
       cancelButtonText: 'No, keep it'
     }).then((result) => {
       if (result.isConfirmed) {
-        const token = localStorage.getItem('token');
-        const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-        this.http.delete(`http://localhost:3000/api/documents/${documentId}`, { headers }).subscribe({
+        this.http.delete(`http://localhost:3000/api/documents/${documentId}`, { headers: this.getHeaders() }).subscribe({
           next: () => {
-            Swal.fire({
-              title: 'Deleted!',
-              text: 'Document has been deleted.',
-              icon: 'success',
-              confirmButtonText: 'OK'
-            });
+            Swal.fire('Deleted!', 'Document has been deleted.', 'success');
             this.fetchDocuments(); 
           },
-          error: (err) => {
-            Swal.fire({
-              title: 'Delete Failed!',
-              text: 'There was an error deleting the document.',
-              icon: 'error',
-              confirmButtonText: 'OK'
-            });
+          error: () => {
+            Swal.fire('Delete Failed!', 'There was an error deleting the document.', 'error');
           }
         });
       }
     });
   }
-
-  editDocument(documentId: number, updatedTitle: string, updatedDescription: string, selectedFile?: File): void {
-    const formData = new FormData();
-    formData.append('title', updatedTitle);
-    formData.append('description', updatedDescription);
-    if (selectedFile) {
-      formData.append('document', selectedFile);
+  assignSelectedSlot(bookingId: number): void {
+    const slotId = this.selectedSlot[bookingId];
+    
+    // ตรวจสอบว่า slotId ถูกต้องหรือไม่ก่อนส่งไป API
+    if (!slotId) {
+      Swal.fire('Error', 'Please select a slot before assigning.', 'error');
+      return;
     }
   
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    // ตรวจสอบว่าทั้ง bookingId และ slotId เป็นตัวเลข
+    if (isNaN(bookingId) || isNaN(slotId)) {
+      Swal.fire('Error', 'Booking ID and Slot ID must be numeric values.', 'error');
+      return;
+    }
   
-    this.http.put(`http://localhost:3000/api/documents/${documentId}`, formData, { headers }).subscribe({
-      next: (response) => {
-        console.log('Document updated successfully:', response);
-        this.fetchDocuments(); 
-      },
-      error: (error) => {
-        console.error('Error updating document:', error);
-      }
-    });
-  } 
+    // ส่งข้อมูลไปที่ API
+    const body = { Id: bookingId, slotId: slotId };
+    this.http.post('http://localhost:3000/api/admin/assignSlot', body, { headers: this.getHeaders() })
+      .subscribe({
+        next: () => {
+          Swal.fire('Success', 'Slot assigned successfully!', 'success');
+          this.getBookings(); 
+          this.getAvailableSlots(); 
+        },
+        error: (error) => {
+          Swal.fire('Error', 'Failed to assign slot.', 'error');
+          console.error('Error assigning slot:', error);
+        }
+      });
+  }
+  
+  
 }

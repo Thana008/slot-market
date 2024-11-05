@@ -1,38 +1,56 @@
 <div class="container mt-5">
-  <h2 class="text-center">User Profile</h2>
-  <div class="card mx-auto shadow" style="width: 24rem;">
-    <div class="card-header bg-primary text-white text-center">
-      <h4>User Profile</h4>
-    </div>
-    <div class="card-body text-center" *ngIf="!editMode; else editProfileTemplate">
-      <div class="profile-pic mb-3">
-        <img [src]="profileImage || 'https://via.placeholder.com/150'" alt="Profile" class="rounded-circle" width="150" height="150">
-      </div>
-
-      <h5 class="card-title">{{ name }}</h5>
-      <p>Email: <span>{{ email }}</span></p>
-      <p>Role: <span>{{ role }}</span></p>
-      <p>Booking Status: <span>{{ bookingStatus }}</span></p>
-      <p *ngIf="assignedSlot">Assigned Slot: <span>{{ assignedSlot }}</span></p>
-
-      <button *ngIf="bookingStatus === 'confirmed'" class="btn btn-danger mt-2" (click)="cancelBooking()">Cancel Booking</button>
-      
-      <button class="btn btn-primary mt-2" (click)="editMode = true">Edit Profile</button>
-    </div>
-    
-    <ng-template #editProfileTemplate>
-      <div class="card-body">
-        <div class="form-group mb-3">
-          <label for="name">Name</label>
-          <input type="text" id="name" [(ngModel)]="name" class="form-control">
+  <div class="row">
+    <!-- User Profile Card -->
+    <div class="col-md-4">
+      <div class="card mx-auto shadow" style="width: 100%;">
+        <div class="card-header bg-primary text-white text-center">
+          <h4>User Profile</h4>
         </div>
-        <div class="form-group mb-3">
-          <label for="email">Email</label>
-          <input type="email" id="email" [(ngModel)]="email" class="form-control">
+        <div class="card-body text-center" *ngIf="!editMode; else editProfileTemplate">
+          <div class="profile-pic mb-3">
+            <img [src]="profileImage || 'https://via.placeholder.com/150'" alt="Profile" class="rounded-circle" width="150" height="150">
+          </div>
+
+          <h5 class="card-title">{{ name }}</h5>
+          <p>Email: <span>{{ email }}</span></p>
+
+          <button class="btn btn-primary mt-2" (click)="editMode = true">Edit Profile</button>
         </div>
-        <button class="btn btn-success mt-2" (click)="updateProfile()">Save</button>
-        <button class="btn btn-secondary mt-2" (click)="editMode = false">Cancel</button>
+
+        <!-- Edit Profile Template -->
+        <ng-template #editProfileTemplate>
+          <div class="card-body">
+            <!-- Form fields for editing the profile -->
+          </div>
+        </ng-template>
       </div>
-    </ng-template>
+    </div>
+
+    <!-- Booking Information Card -->
+    <div class="col-md-6">
+      <div class="card mx-auto shadow mt-4 mt-md-8" style="width: 24rem;">
+        <div class="card-header bg-success text-white text-center">
+          <h4>Booking Information</h4>
+        </div>
+        <div class="card-body text-center">
+          <p>Booking ID: <span>{{ userBooking.id }}</span></p>
+          <p>Firstname: <span>{{ userBooking.firstname }}</span></p>
+          <p>Lastname: <span>{{ userBooking.lastname }}</span></p>
+          <p>Booking Status: <span>{{ userBooking.status }}</span></p>
+          <p>Payment Status: <span>{{ userBooking.payment_status }}</span></p>
+          <p>Food Type: <span>{{ userBooking.foodtype }}</span></p>
+          <p>Slot: <span>{{ userBooking.slot_name }}</span></p> <!-- แสดง slot_name -->
+
+          <!-- Cancel Booking Button -->
+          <button *ngIf="userBooking.status === 'confirmed'" class="btn btn-danger mt-2" (click)="cancelBooking()">Cancel Booking</button>
+
+          <!-- Payment Button -->
+          <button *ngIf="userBooking.status === 'confirmed' && userBooking.payment_status === 'pending'" class="btn btn-warning mt-2" (click)="navigateToPayments()">Make Payment</button>
+
+          <!-- Print Receipt Button -->
+          <button *ngIf="userBooking.payment_status === 'paid'" class="btn btn-success mt-2" (click)="printReceipt()">Print Receipt</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
