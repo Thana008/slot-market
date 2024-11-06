@@ -4,17 +4,18 @@
     <div class="col-md-4">
       <div class="card mx-auto shadow" style="width: 100%;">
         <div class="card-header bg-primary text-white text-center">
-          <h4>User Profile</h4>
+          <h4>User Profile(โปรไฟล์)</h4>
         </div>
         <div class="card-body text-center" *ngIf="!editMode; else editProfileTemplate">
           <div class="profile-pic mb-3">
-            <img [src]="profileImage || 'https://via.placeholder.com/150'" alt="Profile" class="rounded-circle" width="150" height="150">
+            <img [src]="profileImage || 'https://via.placeholder.com/150'" alt="Profile" class="rounded-circle"
+              width="150" height="150">
           </div>
 
           <h5 class="card-title">{{ name }}</h5>
           <p>Email: <span>{{ email }}</span></p>
 
-          <button class="btn btn-primary mt-2" (click)="editMode = true">Edit Profile</button>
+          <button class="btn btn-primary mt-2" (click)="editMode = true">แก้ไขโปรไฟล์</button>
         </div>
 
         <!-- Edit Profile Template -->
@@ -30,25 +31,28 @@
     <div class="col-md-6">
       <div class="card mx-auto shadow mt-4 mt-md-8" style="width: 24rem;">
         <div class="card-header bg-success text-white text-center">
-          <h4>Booking Information</h4>
+          <h4>ข้อมูลการจอง</h4>
         </div>
         <div class="card-body text-center">
-          <p>Booking ID: <span>{{ userBooking.id }}</span></p>
-          <p>Firstname: <span>{{ userBooking.firstname }}</span></p>
-          <p>Lastname: <span>{{ userBooking.lastname }}</span></p>
-          <p>Booking Status: <span>{{ userBooking.status }}</span></p>
-          <p>Payment Status: <span>{{ userBooking.payment_status }}</span></p>
-          <p>Food Type: <span>{{ userBooking.foodtype }}</span></p>
+          <p>รหัสการจอง: <span>{{ userBooking.id }}</span></p>
+          <p>ชื่อ: <span>{{ userBooking.firstname }}</span></p>
+          <p>นามสกุล: <span>{{ userBooking.lastname }}</span></p>
+          <p>สถานะการจอง: <span>{{ userBooking.status }}</span></p>
+          <p>สถานะการจ่ายเงิน: <span>{{ userBooking.payment_status }}</span></p>
+          <p>อาหารที่ขาย: <span>{{ userBooking.foodtype }}</span></p>
           <p>Slot: <span>{{ userBooking.slot_name }}</span></p> <!-- แสดง slot_name -->
 
           <!-- Cancel Booking Button -->
-          <button *ngIf="userBooking.status === 'confirmed'" class="btn btn-danger mt-2" (click)="cancelBooking()">Cancel Booking</button>
+          <button *ngIf="userBooking.status === 'confirmed'" class="btn btn-danger mt-2"
+            (click)="cancelBooking()">ยกเลิกการจอง</button>
 
           <!-- Payment Button -->
-          <button *ngIf="userBooking.status === 'confirmed' && userBooking.payment_status === 'pending'" class="btn btn-warning mt-2" (click)="navigateToPayments()">Make Payment</button>
+          <button *ngIf="userBooking.status === 'confirmed' && userBooking.payment_status === 'pending'"
+            class="btn btn-warning mt-2" (click)="navigateToPayments()">Make Payment</button>
 
           <!-- Print Receipt Button -->
-          <button *ngIf="userBooking.payment_status === 'paid'" class="btn btn-success mt-2" (click)="printReceipt()">Print Receipt</button>
+          <button *ngIf="userBooking.payment_status === 'paid'" class="btn btn-success mt-2" (click)="printReceipt()">
+            พิมพ์ใบเสร็จรับเงิน</button>
         </div>
       </div>
     </div>

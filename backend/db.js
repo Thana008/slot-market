@@ -3,9 +3,9 @@ const sql = require('mssql');
 // Database configuration
 const config = {
   user: 'sa',
-  password: '1234',
-  server: 'localhost',
-  database: 'slot_market',
+  password: '123456789',
+  server: 'LAPTOP-GSHFC4D4',
+  database: 'slot-market (2)',
   options: {
     encrypt: true,
     trustServerCertificate: true,

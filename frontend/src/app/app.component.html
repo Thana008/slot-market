@@ -6,25 +6,25 @@
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav me-auto">
       <li class="nav-item">
-        <a class="nav-link" routerLink="/home">Home</a>
+        <a class="nav-link" routerLink="/home">หน้าหลัก</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" routerLink="/booking-detail">Booking Detail</a>
+        <a class="nav-link" routerLink="/booking-detail">ข้อมูลตลาด</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" routerLink="/contact">Contact</a>
+        <a class="nav-link" routerLink="/contact">ช่องทางการติดต่อ</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" routerLink="/documents">Documents</a>
+        <a class="nav-link" routerLink="/documents">เอกสารที่จำเป็น</a>
       </li>
     </ul>
     <ul class="navbar-nav ms-auto">
       <!-- แสดงปุ่ม Login และ Signup ถ้ายังไม่ได้ล็อกอิน -->
       <li class="nav-item" *ngIf="!isLoggedIn">
-        <a class="nav-link btn btn-dark me-2" routerLink="/login"><i class="bi bi-key"></i> Login</a>
+        <a class="nav-link btn btn-dark me-2" routerLink="/login"><i class="bi bi-key"></i> เข้าสู่ระบบ</a>
       </li>
       <li class="nav-item" *ngIf="!isLoggedIn">
-        <a class="nav-link btn btn-success" routerLink="/register"><i class="bi bi-person-fill-add"></i> Register</a>
+        <a class="nav-link btn btn-success" routerLink="/register"><i class="bi bi-person-fill-add"></i> สมัครสมาชิก</a>
       </li>
     
       <!-- แสดงชื่อผู้ใช้และปุ่ม Logout เมื่อล็อกอินแล้ว -->
@@ -35,10 +35,10 @@
         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
           <li><a class="dropdown-item" routerLink="/profile">Profile</a></li>
           <li *ngIf="userRole === 'admin'">
-            <a class="dropdown-item" routerLink="/management">Management</a>
+            <a class="dropdown-item" routerLink="/management">การจัดการ</a>
           </li>
           <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" (click)="onLogout()">Logout</a></li>
+          <li><a class="dropdown-item" (click)="onLogout()">ออกจากระบบ</a></li>
         </ul>
       </li>
     </ul>

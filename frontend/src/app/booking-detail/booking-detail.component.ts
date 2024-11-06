@@ -8,93 +8,373 @@ import { Router } from '@angular/router';
   styleUrls: ['./booking-detail.component.css']
 })
 export class BookingDetailComponent implements OnInit {
-  // ข้อมูล slots ของคุณ
+  // ข้อมูล slots ทั้งหมด
   slots = [
-    { id: 1, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image1.jpg' },
-    { id: 2, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image2.jpg' },
-    { id: 3, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image3.jpg' },
-    { id: 4, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image4.jpg' },
-    { id: 5, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image5.jpg' },
-    { id: 6, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image6.jpg' },
-    { id: 7, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image7.jpg' },
-    { id: 8, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image8.jpg' },
-    { id: 9, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image9.jpg' },
-    { id: 10, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image10.jpg' },
-    { id: 11, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image11.jpg' },
-    { id: 12, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image12.jpg' },
-    { id: 13, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image13.jpg' },
-    { id: 14, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image14.jpg' },
-    { id: 15, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image15.jpg' },
-    { id: 16, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image16.jpg' },
-    { id: 17, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image17.jpg' },
-    { id: 18, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image18.jpg' },
-    { id: 19, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image19.jpg' },
-    { id: 20, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image20.jpg' },
-    { id: 21, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image21.jpg' },
-    { id: 22, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image22.jpg' },
-    { id: 23, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image23.jpg' },
-    { id: 24, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image24.jpg' },
-    { id: 25, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image25.jpg' },
-    { id: 26, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image26.jpg' },
-    { id: 27, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image27.jpg' },
-    { id: 28, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image28.jpg' },
-    { id: 29, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image29.jpg' },
-    { id: 30, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image30.jpg' },
-    { id: 31, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image31.jpg' },
-    { id: 32, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image32.jpg' },
-    { id: 33, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image33.jpg' },
-    { id: 34, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image34.jpg' },
-    { id: 35, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image35.jpg' },
-    { id: 36, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image36.jpg' },
-    { id: 37, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image37.jpg' },
-    { id: 38, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image38.jpg' },
-    { id: 39, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image39.jpg' },
-    { id: 40, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image40.jpg' },
-    { id: 41, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image41.jpg' },
-    { id: 42, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image42.jpg' },
-    { id: 43, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image43.jpg' },
-    { id: 44, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image44.jpg' },
-    { id: 45, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image45.jpg' },
-    { id: 46, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image46.jpg' },
-    { id: 47, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image47.jpg' },
-    { id: 48, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image48.jpg' },
-    { id: 49, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image49.jpg' },
-    { id: 50, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image50.jpg' },
-    { id: 51, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image51.jpg' },
-    { id: 52, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image52.jpg' },
-    { id: 53, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image53.jpg' },
-    { id: 54, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image54.jpg' },
-    { id: 55, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image55.jpg' },
-    { id: 56, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image56.jpg' },
-    { id: 57, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image57.jpg' },
-    { id: 58, name: 'KU-Market', size: '2 x 2.30 ตารางเมตร', image: 'assets/images/market-image58.jpg' },
-    { id: 59, name: 'KU-Market', size: '3 x 2.50 ตารางเมตร', image: 'assets/images/market-image59.jpg' },
-    { id: 60, name: 'KU-Market', size: '4 x 3.00 ตารางเมตร', image: 'assets/images/market-image60.jpg' },
-  ];
+    {
+      "id": 1,
+      "name": "KU-Market Slot 1",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 2,
+      "name": "KU-Market Slot 2",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 3,
+      "name": "KU-Market Slot 3",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 4,
+      "name": "KU-Market Slot 4",
+      "size": "4 x 3.00 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 5,
+      "name": "KU-Market Slot 5",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 6,
+      "name": "KU-Market Slot 6",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 7,
+      "name": "KU-Market Slot 7",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 8,
+      "name": "KU-Market Slot 8",
+      "size": "4 x 3.00 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 9,
+      "name": "KU-Market Slot 9",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 10,
+      "name": "KU-Market Slot 10",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 11,
+      "name": "KU-Market Slot 11",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 12,
+      "name": "KU-Market Slot 12",
+      "size": "4 x 3.00 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 13,
+      "name": "KU-Market Slot 13",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 14,
+      "name": "KU-Market Slot 14",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 15,
+      "name": "KU-Market Slot 15",
+      "size": "4 x 3.00 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 16,
+      "name": "KU-Market Slot 16",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 17,
+      "name": "KU-Market Slot 17",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 18,
+      "name": "KU-Market Slot 18",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 19,
+      "name": "KU-Market Slot 19",
+      "size": "4 x 3.00 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 20,
+      "name": "KU-Market Slot 20",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 21,
+      "name": "KU-Market Slot 21",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 22,
+      "name": "KU-Market Slot 22",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 23,
+      "name": "KU-Market Slot 23",
+      "size": "4 x 3.00 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 24,
+      "name": "KU-Market Slot 24",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 25,
+      "name": "KU-Market Slot 25",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 26,
+      "name": "KU-Market Slot 26",
+      "size": "4 x 3.00 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 27,
+      "name": "KU-Market Slot 27",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 28,
+      "name": "KU-Market Slot 28",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 29,
+      "name": "KU-Market Slot 29",
+      "size": "4 x 3.00 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 30,
+      "name": "KU-Market Slot 30",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 31,
+      "name": "KU-Market Slot 31",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 32,
+      "name": "KU-Market Slot 32",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 33,
+      "name": "KU-Market Slot 33",
+      "size": "4 x 3.00 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 34,
+      "name": "KU-Market Slot 34",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 35,
+      "name": "KU-Market Slot 35",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 36,
+      "name": "KU-Market Slot 36",
+      "size": "4 x 3.00 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 37,
+      "name": "KU-Market Slot 37",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 38,
+      "name": "KU-Market Slot 38",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 39,
+      "name": "KU-Market Slot 39",
+      "size": "4 x 3.00 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 40,
+      "name": "KU-Market Slot 40",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 41,
+      "name": "KU-Market Slot 41",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 42,
+      "name": "KU-Market Slot 42",
+      "size": "4 x 3.00 ตารางเมตร",
+     "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 43,
+      "name": "KU-Market Slot 43",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 44,
+      "name": "KU-Market Slot 44",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 45,
+      "name": "KU-Market Slot 45",
+      "size": "4 x 3.00 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 46,
+      "name": "KU-Market Slot 46",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 47,
+      "name": "KU-Market Slot 47",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 48,
+      "name": "KU-Market Slot 48",
+      "size": "4 x 3.00 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 49,
+      "name": "KU-Market Slot 49",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 50,
+      "name": "KU-Market Slot 50",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 51,
+      "name": "KU-Market Slot 51",
+      "size": "4 x 3.00 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 52,
+      "name": "KU-Market Slot 52",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 53,
+      "name": "KU-Market Slot 53",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 54,
+      "name": "KU-Market Slot 54",
+      "size": "4 x 3.00 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 55,
+      "name": "KU-Market Slot 55",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 56,
+      "name": "KU-Market Slot 56",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 57,
+      "name": "KU-Market Slot 57",
+      "size": "4 x 3.00 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 58,
+      "name": "KU-Market Slot 58",
+      "size": "2 x 2.30 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 59,
+      "name": "KU-Market Slot 59",
+      "size": "3 x 2.50 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    },
+    {
+      "id": 60,
+      "name": "KU-Market Slot 60",
+      "size": "4 x 3.00 ตารางเมตร",
+      "images": ["assets/01.png", "assets/02.png", "assets/03.png"]
+    }
+];
   currentPage = 1;
   itemsPerPage = 10;
 
-  constructor(private router: Router) { } // เพิ่ม Router ที่นี่
-
-  // confirmBooking() {
-  //   Swal.fire({
-  //     title: 'ยืนยันการจองพื้นที่นี้หรือไม่?',
-  //     icon: 'question',
-  //     showCancelButton: true,
-  //     confirmButtonColor: '#3085d6',
-  //     cancelButtonColor: '#d33',
-  //     confirmButtonText: 'ยืนยัน',
-  //     cancelButtonText: 'ยกเลิก'
-  //   }).then((result) => {
-  //     if (result.isConfirmed) {
-  //       // เมื่อยืนยัน ให้ไปหน้า booking
-  //       this.router.navigate(['/booking']);
-  //     } else if (result.isDismissed) {
-  //       // เมื่อยกเลิก ให้ไปหน้า booking-detail
-  //       this.router.navigate(['/booking-detail']);
-  //     }
-  //   });
-  // }
+  constructor(private router: Router) { }
 
   ngOnInit(): void {}
 
